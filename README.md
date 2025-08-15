@@ -6,12 +6,21 @@ Analytics infrastructure and reporting tools for Bubble Goods marketplace data.
 
 - **`metabase-mcp/`** - Metabase MCP server for connecting Claude to our self-hosted Metabase instance
 - **`reports/`** - Saved queries and analyses organized by frequency
-  - `weekly/` - Weekly business reports
-  - `monthly/` - Monthly analytics
+  - `monthly/` - Monthly analytics (includes AP Report)
+  - `weekly/` - Weekly business reports  
   - `ad-hoc/` - One-off analyses
 - **`dashboards/`** - Dashboard configurations and documentation
 - **`docs/`** - Documentation for data sources, workflows, and processes
 - **`scripts/`** - Utility scripts for data tasks
+
+## Available Reports
+
+### Monthly Reports
+- **Accounts Payable Report** - Monthly brand payouts and obligations
+  - Files: `reports/monthly/accounts_payable_final.sql`
+  - Documentation: `reports/monthly/AP_REPORT_COLUMN_DEFINITIONS.md`
+  - Implementation Guide: `reports/monthly/AP_REPORT_INSTRUCTIONS.md`
+  - Metabase Card: [219](https://mbase.bubblegoods.com/card/219)
 
 ## Quick Setup
 
