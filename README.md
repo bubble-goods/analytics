@@ -10,6 +10,7 @@ Analytics infrastructure and reporting tools for Bubble Goods marketplace data.
   - `monthly/` - Monthly analytics
   - `ad-hoc/` - One-off analyses
 - **`dashboards/`** - Dashboard configurations and documentation
+- **`docs/`** - Documentation for data sources, workflows, and processes
 - **`scripts/`** - Utility scripts for data tasks
 
 ## Quick Setup
