@@ -8,7 +8,7 @@ Analytics infrastructure and reporting tools for Bubble Goods marketplace data.
 - [Analytics Architecture](docs/ANALYTICS_ARCHITECTURE.md) - System overview and data flow
 - [Tool Selection Guide](docs/TOOL_SELECTION.md) - When to use Metabase vs PostHog  
 - [Data Sources](docs/DATA_SOURCES.md) - Complete source to destination mapping
-- [ROAS Implementation Summary](scripts/ROAS_DATA_FIXES_SUMMARY.md) - Recent data fixes and status
+- [Data Migrations](migrations/) - Database and connector upgrade history
 
 ## Analytics Stack
 
@@ -40,9 +40,7 @@ We use a dual-platform approach for different analytics needs:
 - **`metabase-mcp/`** - Metabase MCP server for connecting Claude to our self-hosted Metabase instance
 - **`reports/`** - Saved queries and analyses organized by frequency
   - `monthly/` - Monthly analytics (includes AP Report)
-  - `weekly/` - Weekly business reports  
   - `daily/` - Daily reports (ROAS tracker)
-  - `ad-hoc/` - One-off analyses
 - **`dashboards/`** - Dashboard configurations and documentation
   - `roas/` - ROAS dashboard setup and configuration
 - **`docs/`** - Documentation for data sources, workflows, and processes
@@ -51,6 +49,7 @@ We use a dual-platform approach for different analytics needs:
   - `DATA_SOURCES.md` - Data pipeline and destinations
   - `AD_PERFORMANCE.md` - Ad tracking pipeline details
 - **`scripts/`** - Utility scripts for data tasks
+- **`migrations/`** - Database and connector migration history
 
 ## Available Reports & Dashboards
 
