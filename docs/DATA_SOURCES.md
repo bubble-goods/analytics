@@ -46,7 +46,29 @@
 
 ### 5. Supabase (PostgreSQL)
 **Location:** Metabase Database ID: 5
-**Purpose:** Additional data storage (usage unclear)
+**Purpose:** Data warehouse for ad performance and analytics
+**Key Tables:**
+- `analytics.mv_ad_performance_daily` - Unified ROAS metrics
+- `google_ads.campaign_performance_report` - Raw Google Ads data
+- `meta_ads.ads_insights` - Raw Meta/Facebook Ads data
+
+### 6. Google Ads (via Airbyte)
+**Status:** Active - syncing every 6 hours
+**Purpose:** Advertising campaign performance
+**Contains:**
+- Campaign spend and budgets
+- Click and impression data
+- Conversion tracking (working)
+- ROAS: 1.21x current
+
+### 7. Meta Ads (via Airbyte)
+**Status:** Active but conversion tracking broken
+**Purpose:** Facebook/Instagram advertising
+**Contains:**
+- Campaign spend data
+- Engagement metrics
+- Conversion tracking (currently showing $0)
+- ROAS: 0.00x (needs fix)
 
 ## Data Flow Architecture
 
@@ -56,7 +78,39 @@
 [Zendesk API] → [???] → [Metabase or Direct Analysis]
 [Google Analytics] → [Metabase GA Connector]
 [PostHog] → [Direct Dashboard Access]
+[Google Ads] → [Airbyte] → [Supabase] → [Metabase]
+[Meta Ads] → [Airbyte] → [Supabase] → [Metabase]
 ```
+
+## Data Destinations
+
+### Source to Destination Mapping
+
+| Data Source | ETL Method | Warehouse | Analytics Platform | Update Frequency |
+|-------------|-----------|-----------|-------------------|------------------|
+| Google Ads | Airbyte | Supabase | Metabase | 6 hours |
+| Meta Ads | Airbyte | Supabase | Metabase | 6 hours |
+| Shopify Orders | Read Replica | MySQL | Metabase | Real-time |
+| User Events | JavaScript SDK | - | PostHog | Real-time |
+| Stripe | TBD | TBD | Metabase | Daily |
+| Zendesk | TBD | TBD | Metabase | Daily |
+| Google Analytics | Native Connector | - | Metabase | Daily |
+
+### Platform Usage Guidelines
+
+**Send to Metabase:**
+- Financial data (revenue, costs, margins)
+- Advertising metrics (ROAS, CAC, spend)
+- Business KPIs (GMV, AOV, conversion rates)
+- Operational metrics (fulfillment, inventory)
+- Cross-database queries
+
+**Send to PostHog:**
+- User interactions (clicks, views, scrolls)
+- Conversion funnels
+- Session data
+- A/B test events
+- Feature usage tracking
 
 ## Critical Business Metrics to Track
 
