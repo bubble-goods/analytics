@@ -21,36 +21,51 @@
 - Brand performance
 - Product performance
 
-### 2. Stripe (Seller Payouts)
-**Status:** Referenced but integration unclear
-**Purpose:** Seller payment processing and payout tracking
+### 2. Stripe (Payment Processing)
+**Status:** ⚠️ Active but data issues - needs consolidation
+**Location:** Supabase `stripe` schema (primary), `public` schema (current sync)
+**Purpose:** Payment processing and seller payout tracking
 **Contains:**
-- Payout schedules and amounts
-- Transaction fees
-- Payment failures
-- Seller financial health metrics
+- Charges (8,126 records) - Customer payments
+- Invoices (4,676 records) - Billing records
+- Subscriptions (355 records) - Recurring payments
+- Refunds - Payment reversals
+- Prices - Product pricing data
+**Data Issues:**
+- Primary data in `stripe` schema is 132 days old
+- Current syncs going to wrong schema (`public`)
+- Requires data consolidation
 
-### 3. Zendesk (Customer Communications)
-**Status:** Referenced but integration unclear  
-**Purpose:** Customer support and seller communications
+### 3. Zendesk (Customer Support)
+**Status:** ✅ Active and current
+**Location:** Supabase `zendesk` schema
+**Purpose:** Customer support and communication tracking
 **Contains:**
-- Support ticket volume and resolution times
-- Customer satisfaction scores
-- Common issue categories
-- Support team performance
+- Tickets (17,369 records) - ✅ Current
+- Ticket Comments (88,264 records) - ✅ Current
+- Ticket Audits - Change history
+- Satisfaction Ratings (5,258 records) - ❌ 105 days old
+- Support metrics and performance data
 
 ### 4. Google Analytics (via Metabase)
 **Location:** Metabase Database ID: 4
 **Purpose:** Web traffic and behavior analytics
 **Supplements:** PostHog implementation
 
-### 5. Supabase (PostgreSQL)
+### 5. Supabase (PostgreSQL Data Warehouse)
 **Location:** Metabase Database ID: 5
-**Purpose:** Data warehouse for ad performance and analytics
+**Purpose:** Central data warehouse for all external data sources
+**Schema Organization:**
+- `stripe.*` - Payment and financial data (needs consolidation)
+- `zendesk.*` - Support and communication data
+- `google_ads.*` - Google advertising data
+- `meta_ads.*` - Meta/Facebook advertising data
+- `analytics.*` - Transformed and materialized views
+- `public.*` - Mixed data (needs cleanup)
 **Key Tables:**
 - `analytics.mv_ad_performance_daily` - Unified ROAS metrics
-- `google_ads.campaign_performance_report` - Raw Google Ads data
-- `meta_ads.ads_insights` - Raw Meta/Facebook Ads data
+- `stripe.charges` - Payment transactions
+- `zendesk.tickets` - Support tickets
 
 ### 6. Google Ads (via Airbyte)
 **Status:** Active - syncing every 6 hours
@@ -74,27 +89,27 @@
 
 ```
 [Shopify Store] → [Production DB] → [Read Replica] → [Metabase]
-[Stripe API] → [???] → [Metabase or Direct Analysis]
-[Zendesk API] → [???] → [Metabase or Direct Analysis]
+[Stripe API] → [Airbyte] → [Supabase stripe schema] → [Metabase]
+[Zendesk API] → [Airbyte] → [Supabase zendesk schema] → [Metabase]
 [Google Analytics] → [Metabase GA Connector]
 [PostHog] → [Direct Dashboard Access]
-[Google Ads] → [Airbyte] → [Supabase] → [Metabase]
-[Meta Ads] → [Airbyte] → [Supabase] → [Metabase]
+[Google Ads] → [Airbyte] → [Supabase google_ads schema] → [Metabase]
+[Meta Ads] → [Airbyte] → [Supabase meta_ads schema] → [Metabase]
 ```
 
 ## Data Destinations
 
 ### Source to Destination Mapping
 
-| Data Source | ETL Method | Warehouse | Analytics Platform | Update Frequency |
-|-------------|-----------|-----------|-------------------|------------------|
-| Google Ads | Airbyte | Supabase | Metabase | 6 hours |
-| Meta Ads | Airbyte | Supabase | Metabase | 6 hours |
-| Shopify Orders | Read Replica | MySQL | Metabase | Real-time |
-| User Events | JavaScript SDK | - | PostHog | Real-time |
-| Stripe | TBD | TBD | Metabase | Daily |
-| Zendesk | TBD | TBD | Metabase | Daily |
-| Google Analytics | Native Connector | - | Metabase | Daily |
+| Data Source | ETL Method | Warehouse Schema | Analytics Platform | Update Frequency | Status |
+|-------------|-----------|------------------|-------------------|------------------|---------|
+| Google Ads | Airbyte | `supabase.google_ads` | Metabase | 6 hours | ✅ Current |
+| Meta Ads | Airbyte | `supabase.meta_ads` | Metabase | 6 hours | ⚠️ 10 days behind |
+| Shopify Orders | Read Replica | MySQL | Metabase | Real-time | ✅ Current |
+| User Events | JavaScript SDK | - | PostHog | Real-time | ✅ Current |
+| Stripe | Airbyte | `supabase.stripe` | Metabase | Daily | ❌ Schema mismatch |
+| Zendesk | Airbyte | `supabase.zendesk` | Metabase | Daily | ✅ Mostly current |
+| Google Analytics | Native Connector | - | Metabase | Daily | ✅ Current |
 
 ### Platform Usage Guidelines
 
